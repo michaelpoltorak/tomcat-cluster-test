@@ -1,5 +1,5 @@
 <%@ page import="java.util.Date" %>
-TOMCAT-CLUSTER 2 !!
+TOMCAT-CLUSTER 2 !
 <br/>
 Session Id : <%=request.getSession().getId()%>
 <br/>
