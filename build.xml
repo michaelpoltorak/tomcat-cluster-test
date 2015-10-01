@@ -1,0 +1,98 @@
+<project name="tomcat-cluster" default="deploy.local" basedir=".">
+
+    <property name="app.name" value="tc"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="build.home" value="build"/>
+    <property name="src.dir" value="src"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="config.dir" value="config"/>
+    <property name="web.lib.dir" value="WEB-INF/lib"/>
+    <property name="web.classes.dir" value="WEB-INF/classes"/>
+    <property name="web.build.dir" value="${build.home}/WEB-INF/classes"/>
+    <property name="resources.dir" value="resources"/>
+
+    <property name="local.home.dir" value="${user.home}/"/>
+
+    <property name="tomcat.dir" value="Projects/tomcat-cluster/tomcat1/webapps"/>
+    <property name="tomcat.watch.dir" value="Projects/tomcat-cluster/tomcat1/watch"/>
+
+    <!-- Local web server -->
+    <property name="local.web.dir" value="/Library/WebServer/Documents"/>
+
+    <!-- Local services project -->
+    <property name="local.services.dir" value="${local.home.dir}/IdeaProjects/zoloservices/src/dk/zolo"/>
+
+    <target name="init">
+        <!-- stuff -->
+    </target>
+    <target name="depend" depends="init">
+        <!-- stuff -->
+    </target>
+
+    <target name="getfiles">
+        <!-- Get files from external sources -->
+    </target>
+    <target name="compile.web" depends="depend">
+        <path id="classpath.base">
+            <fileset dir="${basedir}/WEB-INF/lib/">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <javac srcdir="${src.dir}" destdir="${build.dir}/WEB-INF/classes/" encoding="UTF-8">
+            <classpath refid="classpath.base"/>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="war-package.local" depends="getfiles, compile.web">
+        <copy todir="${web.classes.dir}">
+            <fileset dir="config"/>
+        </copy>
+        <mkdir dir="${build.home}/WEB-INF"/>
+        <copy overwrite="yes" file="WEB-INF/web.xml" todir="${build.home}/WEB-INF"/>
+
+        <mkdir dir="${dist.dir}"/>
+
+        <jar jarfile="${dist.dir}/${app.name}.war">
+            <fileset dir="resources" includes="**"/>
+            <fileset dir=".">
+                <include name="WEB-INF/**"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <fileset dir="${build.home}" includes="WEB-INF/**" excludes="**/*.tld;**/*.dtd"/>
+        </jar>
+    </target>
+
+    <target name="deploy.local" depends="prepare.lib, war-package.local">
+        <property name="tomcat.webapps" value="${local.home.dir}/${tomcat.watch.dir}"/>
+        <copy file="${dist.dir}/${app.name}.war" todir="${tomcat.webapps}" failonerror="true" overwrite="true"
+              preservelastmodified="false"/>
+    </target>
+
+
+    <target name="clean">
+        <!--<delete includeEmptyDirs="true">
+            <fileset dir="${resources.dir}" includes="**/*" excludes="login/**"/>
+        </delete>-->
+        <delete dir="${resources.dir}/app"/>
+        <delete dir="${resources.dir}/assets"/>
+        <delete dir="src/dk/*"/>
+        <delete dir="${web.lib.dir}"/>
+        <delete dir="${web.classes.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${build.home}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="prepare.lib">
+        <mkdir dir="${web.lib.dir}"/>
+        <mkdir dir="${web.classes.dir}"/>
+        <mkdir dir="${build.dir}/WEB-INF/classes"/>
+        <mkdir dir="${build.dir}/WEB-INF/lib"/>
+        <copy todir="${web.lib.dir}">
+            <fileset dir="${lib.dir}" includes="**/*"/>
+        </copy>
+    </target>
+
+</project>
